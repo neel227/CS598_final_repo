@@ -4,6 +4,7 @@ import glob
 import os
 SEED = 12
 
+# Get root of data
 jpeg_root = 'jpeg'  # adjust if needed
 jpg_files = glob.glob(os.path.join(jpeg_root, '**', '*.jpg'), recursive=True)
 
@@ -16,6 +17,7 @@ for path in jpg_files:
 
 jpg_names = glob.glob('jpeg/**/*.jpg', recursive=True)
 file_names = pd.Series([f.split('\\')[1] for f in jpg_names])
+
 
 def create_data_split(csv_path, name):
     # Read in data
@@ -35,19 +37,15 @@ def create_data_split(csv_path, name):
     count_1s = min(sum(df['label']), round(.5 * count_0s))
 
 
-    print("1s: ", count_1s)
-    print("0s: ", count_0s)
-    print("Len", len(df))
+    # print("1s: ", count_1s)
+    # print("0s: ", count_0s)
+    # print("Len", len(df))
 
+    # Grab data sampled at the right level
     z = df[df['label'] == 0].sample(n=count_0s, random_state=SEED)
     o = df[df['label'] == 1]
 
     df_samp = pd.concat([z, o]).sample(frac=1, random_state=SEED).reset_index(drop=True)
-
-
-    # QA Validation
-    matching_values = df_samp['sop_uid'][df_samp['sop_uid'].isin(file_names)].unique()
-    print(len(matching_values))
     
     # Output df
     df_samp.to_csv(name, index=True)
